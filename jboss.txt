@@ -1,0 +1,24 @@
+FROM      ubuntu
+USER      root
+RUN       apt update
+RUN       apt install -y openjdk-8-jdk
+RUN       groupadd -r wildfly
+RUN       apt-get install -y systemd
+RUN       dpkg -L systemd
+RUN       apt install -y wget
+RUN       useradd -r -g wildfly -d /opt/wildfly -s /sbin/nologin wildfly
+ENV       WILDFLY_VERSION=16.0.0.Final
+RUN       wget https://download.jboss.org/wildfly/$WILDFLY_VERSION/wildfly-$WILDFLY_VERSION.tar.gz -P /tmp
+RUN       tar xf /tmp/wildfly-$WILDFLY_VERSION.tar.gz -C /opt
+RUN       ln -s /opt/wildfly-$WILDFLY_VERSION /opt/wildfly
+RUN       chown -RH wildfly: /opt/wildfly
+RUN       mkdir -p /etc/wildfly
+RUN       cp /opt/wildfly/docs/contrib/scripts/systemd/wildfly.conf /etc/wildfly
+RUN       cp /opt/wildfly/docs/contrib/scripts/systemd/launch.sh /opt/wildfly/bin
+RUN       sh -c 'chmod +x /opt/wildfly/bin/*.sh'
+RUN       cp /opt/wildfly/docs/contrib/scripts/systemd/wildfly.service /etc/systemd/system/
+CMD ["/opt/jboss/wildfly/bin/standalone.sh", "-b", "0.0.0.0"]
+
+
+
+  http://ec2-52-87-199-23.compute-1.amazonaws.com/root/job1.git
